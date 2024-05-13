@@ -26,7 +26,7 @@ def login():
             
 
             if st.button("Login"):
-                if username == "admin" and Password == "admin":
+                if username == "admin" and Password == "0112358":
                     session_state.username=username
                     session_state["Logged in"] = True
                     session_state.gender = gender
