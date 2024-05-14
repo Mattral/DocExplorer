@@ -45,7 +45,7 @@ def create_db(pdfs_folder_path):
 
     # Create vector store from documents and embeddings
     try:
-        vector_db = FAISS.from_documents(docs, encoder)
+        vector_db = FAISS.from_texts(texts, embeddings)
     except Exception as e:
         raise Exception(f"Error creating vector DB: {str(e)}")
     
