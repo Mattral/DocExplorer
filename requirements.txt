@@ -6,3 +6,4 @@ langchain
 clarifai
 streamlit
 faiss-cpu
+sentence_transformers==2.2.2
