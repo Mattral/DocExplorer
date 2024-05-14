@@ -24,22 +24,22 @@ def create_db(pdfs_folder_path):
         raise Exception("No Documents created after splitting")
 
     print(f"Number of documents created: {len(docs)}")
-    print(f"First document: {docs[0].page_content[:100]}")
+    print(f"First document: {docs[0].page_content[:100]}")  # Print first 100 characters of the first doc
 
     # Extract texts from documents
     texts = [d.page_content for d in docs]
 
     print(f"Number of texts to embed: {len(texts)}")
-    print(f"First text snippet: {texts[0][:100]}")
+    print(f"First text snippet: {texts[0][:100]}")  # Print first 100 characters of the first text
 
     try:
         # Embed the texts using SentenceTransformer
         embeddings = encoder.encode(texts)
-        if embeddings.size == 0:
-            raise Exception("Embedding failed, no embeddings generated")
     except Exception as e:
         raise Exception(f"Error during embedding: {str(e)}")
 
+    if embeddings is None or len(embeddings) == 0:
+        raise Exception("Embedding failed, no embeddings generated")
     if len(embeddings) != len(texts):
         raise Exception(f"Number of embeddings ({len(embeddings)}) does not match number of texts ({len(texts)})")
 
@@ -50,3 +50,12 @@ def create_db(pdfs_folder_path):
         raise Exception(f"Error creating vector DB: {str(e)}")
     
     return vector_db
+
+# Ensure to use st.rerun instead of st.experimental_rerun
+def read_docs():
+    with st.spinner("Reading Documents........"):
+        if not (st.session_state.get("chain_created")) and st.session_state.get("processed"):
+            db = create_db("uploads")
+            st.session_state["qa"] = create_chain(llm, db)  # Replace clarifai_llm with your actual LLM
+            st.session_state["chain_created"] = True
+            st.rerun()
