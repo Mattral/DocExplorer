@@ -1,5 +1,7 @@
 from langchain.chains import RetrievalQA
-from langchain.retrievers import QdrantSparseVectorRetriever
+from langchain_community.retrievers import (
+    QdrantSparseVectorRetriever,
+)
 
 def create_chain(local_llm, vectordb):
     retriever = QdrantSparseVectorRetriever(
