@@ -1,10 +1,11 @@
 from langchain.chains import RetrievalQA
-from langchain.retrievers import QdrantRetriever
+from langchain.retrievers import QdrantSparseVectorRetriever
 
 def create_chain(local_llm, vectordb):
-    retriever = QdrantRetriever(
+    retriever = QdrantSparseVectorRetriever(
         client=vectordb,
-        collection_name="my_facts",
+        collection_name="sparse_collection",
+        vector_name="sparse_vector",
         embedding_function=encoder.encode,
         distance_func='cosine'
     )
@@ -17,7 +18,7 @@ def create_chain(local_llm, vectordb):
     )
 
     qa.combine_documents_chain.llm_chain.prompt.template = '''
-    Your name is Ash.
+    Your name is PTT.
     Use the following pieces of context to answer the user's question and that
     information consist of provided pdf details by user.
     If you don't know the answer, just apologize and say that you couldn't
