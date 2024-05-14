@@ -44,20 +44,25 @@ def create_db(pdfs_folder_path):
         raise Exception(f"Number of embeddings ({len(embeddings)}) does not match number of texts ({len(texts)})")
 
     # Create Qdrant client and collection
-    client = QdrantClient(path="./qdrant_db")
-    client.recreate_collection(
-        collection_name="my_facts",
-        vectors_config=models.VectorParams(
-            size=encoder.get_sentence_embedding_dimension(),
-            distance=models.Distance.COSINE,
-        ),
+    client = QdrantClient(location=":memory:")
+    collection_name = "sparse_collection"
+    vector_name = "sparse_vector"
+
+    client.create_collection(
+        collection_name,
+        vectors_config={},
+        sparse_vectors_config={
+            vector_name: models.SparseVectorParams(
+                index=models.SparseIndexParams(on_disk=False)
+            )
+        },
     )
 
     # Prepare documents for upload
     doc_metadata = [
         models.Record(
             id=i,
-            vector=embedding.tolist(),
+            sparse_vector={vector_name: embedding.tolist()},
             payload={"text": text}
         )
         for i, (text, embedding) in enumerate(zip(texts, embeddings))
@@ -65,7 +70,7 @@ def create_db(pdfs_folder_path):
 
     # Upload documents to Qdrant
     try:
-        client.upload_records(collection_name="my_facts", records=doc_metadata)
+        client.upload_records(collection_name=collection_name, records=doc_metadata)
     except Exception as e:
         raise Exception(f"Error uploading records to Qdrant: {str(e)}")
 
@@ -78,6 +83,6 @@ def read_docs():
     with st.spinner("Reading Documents........"):
         if not (st.session_state.get("chain_created")) and st.session_state.get("processed"):
             db = create_db("uploads")
-            st.session_state["qa"] = create_chain(llm, db)  # Replace llm with your actual LLM
+            st.session_state["qa"] = create_chain(clarifai_llm, db)
             st.session_state["chain_created"] = True
             st.rerun()
