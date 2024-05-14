@@ -31,6 +31,9 @@ def create_db(pdfs_folde_path):
     if len(docs)<1:
         raise Exception("No Documents created")
     else:
+        texts = [d.page_content for d in docs]
+        embeddings = clarifai_embedding_model.embed_documents(texts)
+        if not embeddings or len(embeddings) == 0:
+            raise Exception("Embedding failed, no embeddings generated")
         vector_db = FAISS.from_documents(docs, clarifai_embedding_model)
-    
     return vector_db
