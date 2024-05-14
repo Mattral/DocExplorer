@@ -1,55 +1,38 @@
-from langchain.vectorstores import Clarifai as Clarifai_vectordb
+from langchain.vectorstores import FAISS
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.document_loaders import PyPDFDirectoryLoader
-from langchain.vectorstores import Chroma, FAISS
-from modules.models import *
+from modules.models import clarifai_embedding_model
+import streamlit as st
 
-def create_db(pdfs_folde_path):
-
-    loader = PyPDFDirectoryLoader(pdfs_folde_path)
+def create_db(pdfs_folder_path):
+    # Load PDF documents
+    loader = PyPDFDirectoryLoader(pdfs_folder_path)
     pages = loader.load()
-
+    
     if not pages:
         raise Exception("No pages loaded from PDF documents")
 
+    # Split documents into chunks
     text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=0)
-
     docs = text_splitter.split_documents(pages)
 
     if not docs:
         raise Exception("No Documents created after splitting")
-    
+
+    print(f"Number of documents created: {len(docs)}")
+    print(f"First document: {docs[0].page_content[:100]}")  # Print first 100 characters of the first doc
+
     # Extract texts from documents
     texts = [d.page_content for d in docs]
 
     print(f"Number of texts to embed: {len(texts)}")
     print(f"First text snippet: {texts[0][:100]}")  # Print first 100 characters of the first text
 
-    '''
-    # persist_directory = 'db'
+    # Validate API key format
+    api_key = st.secrets["CLARIFAI_PAT"]
+    if not api_key or len(api_key) < 20:  # Assuming a typical API key length
+        raise Exception("Invalid API key format")
 
-    # vector_db = Chroma.from_documents(documents=docs,
-    #                                 embedding=clarifai_embedding_model,
-    #                                 persist_directory=persist_directory)
-
-
-    # vector_db = Clarifai_vectordb.from_documents(
-    #     user_id=st.secrets["USER_ID"],
-    #     app_id=st.secrets["APP_ID"],
-    #     documents=docs,
-    #     pat=st.secrets["CLARIFAI_PAT"],
-    #     number_of_docs=2,
-    # )
-    if len(docs)<1:
-        raise Exception("No Documents created")
-    else:
-        texts = [d.page_content for d in docs]
-        embeddings = clarifai_embedding_model.embed_documents(texts)
-        if not embeddings or len(embeddings) == 0:
-            raise Exception("Embedding failed, no embeddings generated")
-        vector_db = FAISS.from_documents(docs, clarifai_embedding_model)
-    return vector_db
-    '''
     try:
         # Embed the texts
         embeddings = clarifai_embedding_model.embed_documents(texts)
@@ -68,3 +51,12 @@ def create_db(pdfs_folde_path):
         raise Exception(f"Error creating vector DB: {str(e)}")
     
     return vector_db
+
+# Ensure to use st.rerun instead of st.experimental_rerun
+def read_docs():
+    with st.spinner("Reading Documents........"):
+        if not (st.session_state.get("chain_created")) and st.session_state.get("processed"):
+            db = create_db("uploads")
+            st.session_state["qa"] = create_chain(clarifai_llm, db)
+            st.session_state["chain_created"] = True
+            st.rerun()
