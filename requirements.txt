@@ -7,3 +7,4 @@ clarifai
 streamlit
 faiss-cpu
 sentence_transformers==2.2.2
+qdrant_client==1.7.0
