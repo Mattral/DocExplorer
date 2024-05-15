@@ -1,6 +1,5 @@
 <br/>
 <p align="center">
-  <a href="https://github.com/AB00k/NexTech_Nexus_DocuChat">
     <img src="https://cdn.discordapp.com/attachments/1139556965308170283/1145335042097299466/replicate-prediction-fmktp4jb4zizdykkkld77ym37u-removebg-preview.png" alt="Logo" width="80" height="80">
   </a>
 
@@ -20,7 +19,8 @@
 
 ![Contributors](https://img.shields.io/github/contributors/AB00k/NexTech_Nexus_DocuChat?color=dark-green) ![Forks](https://img.shields.io/github/forks/AB00k/NexTech_Nexus_DocuChat?style=social) 
 
-
+## My modification
+Trying to use alternative DB and use only Open sourced LLM just so anyone could use without paid API.
 
 ## About The Project
 
