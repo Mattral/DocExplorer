@@ -1,7 +1,5 @@
 <br/>
 <p align="center">
-    <img src="https://cdn.discordapp.com/attachments/1139556965308170283/1145335042097299466/replicate-prediction-fmktp4jb4zizdykkkld77ym37u-removebg-preview.png" alt="Logo" width="80" height="80">
-  </a>
 
   <h3 align="center">DocuChat</h3>
 
